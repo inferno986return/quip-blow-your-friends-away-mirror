@@ -10,7 +10,7 @@ To run simply
 
 You can find the rest of the lua source in the lua dir and the images used as textures in data.
 
-Simply edit any of them to create your own version.
+Simply edit any of them to create your own version...
 
 You will need a raspberrypi running raspbian and with at least 32meg given to the GPU. Less than that and it seems to have trouble opening any GL displays. This game will run at the command prompt in full screen mode. No need to start xwindows first.
 
