@@ -1,4 +1,4 @@
-QUIP is a simple single screen 4 player areana shootemup designed to be played with 4 joysticks plugged intp a raspberrypi.
+QUIP is a simple single screen 4 player areana shootemup designed to be played with 4 joysticks plugged into a raspberrypi.
 
 Its made using the gamecake framework which consists of a fat lua binary conaining many lowlevel C libraries and lua wrappers and modules some standard some custom see https://bitbucket.org/xixs/lua and https://bitbucket.org/xixs/bin for full source.
 
