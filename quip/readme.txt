@@ -8,6 +8,8 @@ To run simply
 
 ./lua.raspi quip.lua
 
+At the moment you will need some form of joystick to play, something that shows up in /dev/input/js0 a ps3 controller is probably the easiest option.
+
 You can find the rest of the lua source in the lua dir and the images used as textures in data.
 
 Simply edit any of them to create your own version...
