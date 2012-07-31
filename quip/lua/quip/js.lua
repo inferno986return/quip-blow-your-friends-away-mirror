@@ -14,12 +14,50 @@ bake=function(game)
 	game.js=js
 		
 	js.read=function()
+		local loop=true
+		while loop do
+		loop=false
 		for i=1,4 do
 			local pfix="p"..i.."_"
 			local tab=game.state.win:jread(i-1)
 			if tab then
---				print(i,wstr.dump(tab))
-				
+				loop=true
+
+-- this is a ps3 pad, since I'm the only one with an unbranded ps2 converter thingy :)
+
+-- you can get ps2 to ps3 usb adapters for a couple of quid so lets go with that option
+-- just plug a powered hub and some converters into a PI and away you go
+
+if tab.value==1 then
+				print(i,wstr.dump(tab))
+end
+
+				if tab.type==1 then
+					for i,v in ipairs{
+						{4,"up"},
+						{5,"right"},
+						{6,"down"},
+						{7,"left"},
+						{8,"down"},
+						{9,"up"},
+						{12,"fire"},
+						{13,"fire"},
+						{14,"fire"},
+						{15,"fire"},
+						} do
+						if tab.number==v[1] then
+							if tab.value==0 then
+								game.input.volatile[ pfix..v[2] ]=false
+							else
+								game.input.volatile[ pfix..v[2] ]=true
+							end
+						end
+					end
+				end
+
+
+-- this is my unbranded ps2 converter thingy
+--[[				
 				if tab.number==0 then -- left right
 					if tab.value<-256 then
 						game.input.volatile[pfix.."left"] =true
@@ -50,8 +88,11 @@ bake=function(game)
 						game.input.volatile[pfix.."fire"]=true
 					end
 				end
+]]
 			end
 		end	
+		end
+		
 	end
 
 
