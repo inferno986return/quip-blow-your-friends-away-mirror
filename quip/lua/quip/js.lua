@@ -29,7 +29,7 @@ bake=function(game)
 -- just plug a powered hub and some converters into a PI and away you go
 
 if tab.value==1 then
-				print(i,wstr.dump(tab))
+--				print(i,wstr.dump(tab))
 end
 
 				if tab.type==1 then
