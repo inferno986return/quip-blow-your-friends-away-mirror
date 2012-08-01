@@ -42,6 +42,7 @@ function new_plane(id)
 	
 	plane.spawn=function()
 		plane.state="fly"
+		plane.immune=50
 		plane.x=50+math.random(0,540)
 		plane.y=50+math.random(0,150)
 		plane.vx=0
@@ -56,6 +57,7 @@ function new_plane(id)
 	plane.update=function()
 	
 		plane.heat=plane.heat-1
+		plane.immune=plane.immune-1
 		
 		local i=1
 		while plane.pews[i] do
@@ -118,6 +120,9 @@ function new_plane(id)
 	plane.draw=function()
 		if plane.state~="dead" then
 			gl.Color(pack.argb4_pmf4(0xffff)) 
+			if plane.immune>=0 then
+				gl.Color(pack.argb4_pmf4(0x8fff)) 
+			end
 			cake.sheets:get("plane"..plane.id):draw(1,plane.x,plane.y,plane.rz,1/2,1/2)
 		end
 		if plane.fx then plane.fx.draw() end
@@ -155,13 +160,15 @@ function new_plane(id)
 			end
 			for i,v in ipairs(play.planes) do
 				if v.state=="fly" and v.id~=plane.id then
-					local x=v.x-p.x
-					local y=v.y-p.y
-					if x*x + y*y < 28*28 then
-						v.bang()
-						plane.score=plane.score+1+p.score
-						p.state="dead"
-					end	
+					if v.immune < 0 then
+						local x=v.x-p.x
+						local y=v.y-p.y
+						if x*x + y*y < 28*28 then
+							v.bang()
+							plane.score=plane.score+1+p.score
+							p.state="dead"
+						end	
+					end
 				end
 			end
 		end

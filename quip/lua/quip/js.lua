@@ -8,6 +8,7 @@ local tardis=require("wetgenes.tardis")	-- matrix/vector math
 
 module(...)
 
+local ps3=true
 
 bake=function(game)
 	local js={}
@@ -29,9 +30,11 @@ bake=function(game)
 -- just plug a powered hub and some converters into a PI and away you go
 
 if tab.value==1 then
+-- uncomment this to dump out info from whatever joystick is plugged in
 --				print(i,wstr.dump(tab))
 end
 
+if ps3 then
 				if tab.type==1 then
 					for i,v in ipairs{
 						{4,"up"},
@@ -57,7 +60,9 @@ end
 
 
 -- this is my unbranded ps2 converter thingy
---[[				
+
+else
+
 				if tab.number==0 then -- left right
 					if tab.value<-256 then
 						game.input.volatile[pfix.."left"] =true
@@ -88,7 +93,7 @@ end
 						game.input.volatile[pfix.."fire"]=true
 					end
 				end
-]]
+end
 			end
 		end	
 		end
