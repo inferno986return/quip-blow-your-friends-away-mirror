@@ -63,27 +63,12 @@ end
 
 game.msg=function(state,m)
 --	print(wstr.dump(m))
+		
+	game.js.msg(m)
 	
-	function pset(m,n)
-		if m.action== 1 then game.input.volatile[n]=true  end
-		if m.action==-1 then game.input.volatile[n]=false end
-	end
-	
-	if m.class=="key" then
-		for i,v in ipairs{"up","down","left","right"} do
-			if m.keyname==v then
-				pset(m,"p1_"..v)
-			end
-		end
-		if m.keyname=="control_r" then
-			pset(m,"p1_".."fire")
-		end
-	end
 end
 
 game.update=function(state)
-
-	game.js.read()
 
 	for i,v in pairs(game.input.volatile) do
 		game.input[i]=v 
@@ -92,7 +77,7 @@ game.update=function(state)
 
 	if game.page=="menu" then
 
-		if ( game.input.p1_fire or game.input.p2_fire or game.input.p1_fire or game.input.p2_fire ) and game.wait<=0 then
+		if ( game.input.p1_fire or game.input.p2_fire or game.input.p3_fire or game.input.p4_fire ) and game.wait<=0 then
 			game.page="play"
 			game.play.reset(state)
 		end

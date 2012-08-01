@@ -13,93 +13,148 @@ local ps3=true
 bake=function(game)
 	local js={}
 	game.js=js
+
+-- convert this message into something the game can understand
+	js.msg=function(m)
+	
+		function pset(n,v)
+			game.input.volatile[n]=v
+		end
+
+		if m.class=="key" then
 		
-	js.read=function()
-		local loop=true
-		while loop do
-		loop=false
-		for i=1,4 do
-			local pfix="p"..i.."_"
-			local tab=game.state.win:jread(i-1)
-			if tab then
-				loop=true
+			for i,v in ipairs{"up","down","left","right"} do
+				if m.keyname==v then
+					pset("p1_"..v,m.action==1)
+				end
+			end
+			if m.keyname=="control_r" then
+				pset("p1_".."fire",m.action==1)
+			end
+			
+		elseif m.class=="posix_keyboard" then
+		
+--			print(m.type,m.code,m.value)
 
--- this is a ps3 pad, since I'm the only one with an unbranded ps2 converter thingy :)
-
--- you can get ps2 to ps3 usb adapters for a couple of quid so lets go with that option
--- just plug a powered hub and some converters into a PI and away you go
-
-if tab.value==1 then
--- uncomment this to dump out info from whatever joystick is plugged in
---				print(i,wstr.dump(tab))
-end
-
-if ps3 then
-				if tab.type==1 then
+				if m.type==1 then
 					for i,v in ipairs{
-						{4,"up"},
-						{5,"right"},
-						{6,"down"},
-						{7,"left"},
-						{8,"down"},
-						{9,"up"},
-						{12,"fire"},
-						{13,"fire"},
-						{14,"fire"},
-						{15,"fire"},
+						{103,"p1_up"},		-- curser keys + right ctrl to shoots
+						{108,"p1_down"},
+						{105,"p1_left"},						
+						{106,"p1_right"},
+						{97,"p1_fire"},
+						
+						{72,"p2_up"},		-- number pad curser keys + enter to shoot
+						{80,"p2_down"},
+						{75,"p2_left"},						
+						{77,"p2_right"},
+						{96,"p2_fire"},
+						
+						{17,"p3_up"},		-- wasd + left alt to shoot
+						{31,"p3_down"},
+						{30,"p3_left"},						
+						{32,"p3_right"},
+						{56,"p3_fire"},
+						
 						} do
-						if tab.number==v[1] then
-							if tab.value==0 then
-								game.input.volatile[ pfix..v[2] ]=false
-							else
-								game.input.volatile[ pfix..v[2] ]=true
+						if m.code==v[1] then
+							if m.value==0 then
+								pset(v[2],false)
+							elseif m.value==1 then
+								pset(v[2],true)
 							end
 						end
 					end
 				end
 
 
--- this is my unbranded ps2 converter thingy
+		elseif m.class=="posix_joystick" then
+		
+			local pfix="p"..(m.posix_device.fd_device+1).."_"
+			
+			if m.posix_device.name=="Sony PLAYSTATION(R)3 Controller" then
+				if m.type==1 then
+					for i,v in ipairs{
+						{292,"up"},		-- pad
+						{293,"right"},
+						{294,"down"},
+						{295,"left"},
+						
+						{296,"down"},	-- triggers
+						{297,"up"},
+						{298,"down"},
+						{299,"up"},
+						
+						{300,"fire"},	-- buttons ^,O,X,[]
+						{301,"fire"},
+						{302,"fire"},
+						{303,"fire"},
 
-else
-
-				if tab.number==0 then -- left right
-					if tab.value<-256 then
-						game.input.volatile[pfix.."left"] =true
-						game.input.volatile[pfix.."right"]=false
-					elseif tab.value>256 then
-						game.input.volatile[pfix.."left"] =false
-						game.input.volatile[pfix.."right"]=true
-					else
-						game.input.volatile[pfix.."left"] =false
-						game.input.volatile[pfix.."right"]=false
-					end
-				elseif tab.number==4 then -- down
-					if tab.value==0 then
-						game.input.volatile[pfix.."down"]=false
-					else
-						game.input.volatile[pfix.."down"]=true
-					end
-				elseif tab.number==5 then -- up
-					if tab.value==0 then
-						game.input.volatile[pfix.."up"]=false
-					else
-						game.input.volatile[pfix.."up"]=true
-					end
-				elseif tab.number==2 then -- value
-					if tab.value==0 then
-						game.input.volatile[pfix.."fire"]=false
-					else
-						game.input.volatile[pfix.."fire"]=true
+						{288,"fire"},	-- start
+						{303,"fire"},	-- select
+						} do
+						if m.code==v[1] then
+							if m.value==0 then
+								pset(pfix..v[2],false)
+							else
+								pset(pfix..v[2],true)
+							end
+						end
 					end
 				end
-end
-			end
-		end	
-		end
-		
-	end
+			else
+				if m.type==1 then
+					for i,v in ipairs{
+						{292,"down"},	-- triggers
+						{293,"up"},
+						{294,"down"},
+						{295,"up"},
+						
+						{288,"fire"},	-- buttons ^,O,X,[]
+						{289,"fire"},
+						{290,"fire"},
+						{291,"fire"},
 
+						{296,"fire"},	-- start
+						{297,"fire"},	-- select
+						} do
+						if m.code==v[1] then
+							if m.value==0 then
+								pset(pfix..v[2],false)
+							else
+								pset(pfix..v[2],true)
+							end
+						end
+					end
+				elseif m.type==3 then
+					if m.code==0 then -- left right
+						if m.value<64 then
+							pset(pfix.."left",true)
+							pset(pfix.."right",false)
+						elseif m.value>192 then
+							pset(pfix.."left",false)
+							pset(pfix.."right",true)
+						else
+							pset(pfix.."left",false)
+							pset(pfix.."right",false)
+						end
+					elseif m.code==1 then -- left right
+						if m.value<64 then
+							pset(pfix.."up",true)
+							pset(pfix.."down",false)
+						elseif m.value>192 then
+							pset(pfix.."up",false)
+							pset(pfix.."down",true)
+						else
+							pset(pfix.."up",false)
+							pset(pfix.."down",false)
+						end
+					end
+				end
+--			print(m.type,m.code,m.value)
+			end
+		end
+	end
 
 	return js
 end
